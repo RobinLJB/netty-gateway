@@ -1,0 +1,12 @@
+server :
+  port : 8080
+
+proxy :
+  server1 :
+    host : localhost
+    port : 8000
+    weight : 1
+  server2 :
+    host : localhost
+    port : 8001
+    weight : 1
