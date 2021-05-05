@@ -12,7 +12,7 @@
 作者查看了很多开源第三方负载均衡的tcpip连接的网关应用。
 相同的功能nginx可以做到，用nodejs或者go代码上可能更加容易实现。
 
-然而当查找基于java语言的tcpip连接网关应用却一直找不到，只有想spring-gateway或者zuul等的基于http连接的网关应用。
+然而当查找基于java语言的tcpip连接网关应用却一直找不到，只有像spring-gateway或者zuul等的基于http连接的网关应用。
 
 所以作者用netty实现了一个基于tcpip连接网关应用。
 
