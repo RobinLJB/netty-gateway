@@ -6,15 +6,21 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import org.newsclub.net.unix.AFUNIXSocketAddress;
 import org.robin.gateway.handler.ServerChannelHandler;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
 public class GatewayServer implements NettyServer{
 
-    private int port;
+    private Integer port;
+
+    private String path;
 
     //upstream server list
     private List<InetSocketAddress> subServerList = new ArrayList<InetSocketAddress>();
@@ -22,14 +28,32 @@ public class GatewayServer implements NettyServer{
     private NioEventLoopGroup serverWorkerGroup ;
     private NioEventLoopGroup serverBossGroup;
 
-    public GatewayServer(Integer port) {
-        this.port = port;
+    public GatewayServer() {
         this.serverBossGroup = new NioEventLoopGroup();
         this.serverWorkerGroup = new NioEventLoopGroup();
     }
 
 
-    public void start() throws InterruptedException {
+    public GatewayServer(String path) {
+        this();
+        this.path = path;
+    }
+
+    public GatewayServer(int port) {
+        this();
+        this.port = port;
+    }
+
+
+    public void start() throws InterruptedException, IOException {
+        SocketAddress localAddress;
+        if(port!=null){
+            localAddress = new InetSocketAddress(port);
+        }else if(path!=null) {
+            localAddress = new AFUNIXSocketAddress(new File(path));
+        }else{
+            throw new RuntimeException("could not initialize server socket");
+        }
         try {
             ServerBootstrap bootstrap = new ServerBootstrap();
             bootstrap.group(serverBossGroup, serverWorkerGroup)
@@ -40,7 +64,9 @@ public class GatewayServer implements NettyServer{
                             ch.pipeline().addLast(new ServerChannelHandler(GatewayServer.this));
                         }
                     });
-            ChannelFuture f = bootstrap.bind(port).sync();
+
+            ChannelFuture f = bootstrap.bind(localAddress).sync();
+
             if (f.isSuccess()) {
                 System.out.println("proxy starts successfully at "+port);
             }
@@ -68,6 +94,14 @@ public class GatewayServer implements NettyServer{
 
     public void setPort(int port) {
         this.port = port;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public List<InetSocketAddress> getSubServerList() {

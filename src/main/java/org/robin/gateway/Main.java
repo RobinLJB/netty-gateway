@@ -14,9 +14,16 @@ public class Main {
         List<Map<String,String>> subServerList = initSubServerList(config);
 
         Map server = (Map) config.get("server");
-        String port = String.valueOf(server.get("port"));
+        GatewayServer gatewayServer = new GatewayServer();
+        if(server.get("port")!=null) {
+            String port = String.valueOf(server.get("port"));
+            gatewayServer.setPort(Integer.valueOf(port));
+        }
 
-        GatewayServer gatewayServer = new GatewayServer(Integer.valueOf(port));
+        if(server.get("path")!=null){
+            String path = String.valueOf(server.get("path"));
+            gatewayServer.setPath(path);
+        }
 
         for(Map<String,String> upstreamServer : subServerList){
             String weight = upstreamServer.get("weight");
