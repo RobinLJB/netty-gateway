@@ -1,5 +1,6 @@
 package org.robin.gateway;
 
+import org.newsclub.net.unix.AFUNIXSocketAddress;
 import org.robin.gateway.server.GatewayServer;
 import org.yaml.snakeyaml.Yaml;
 
@@ -30,7 +31,12 @@ public class Main {
             for(int i = 0;i<Integer.valueOf(weight);i++){
                 String host = upstreamServer.get("host");
                 String p = upstreamServer.get("port");
-                gatewayServer.getSubServerList().add(new InetSocketAddress(host,Integer.valueOf(p)));
+                String path = upstreamServer.get("path");
+                if(host!=null && p!=null) {
+                    gatewayServer.getSubServerList().add(new InetSocketAddress(host, Integer.valueOf(p)));
+                }else if(path!=null){
+                    gatewayServer.getSubServerList().add(new AFUNIXSocketAddress(new File(path)));
+                }
             }
         }
 
@@ -74,14 +80,19 @@ public class Main {
         List<Map<String,String>> result = new ArrayList();
         Map proxy = (Map) config.get("proxy");
         for(Map.Entry<String,Map> keyAndValue : (Set<Map.Entry<String,Map>>)proxy.entrySet()){
-            Map value = keyAndValue.getValue();
-            String host = String.valueOf(value.get("host"));
-            String port = String.valueOf(value.get("port"));
-            String weight = value.get("weight")!=null?String.valueOf(value.get("weight")):"1";
-
             Map<String,String> address = new HashMap();
-            address.put("host",host);
-            address.put("port",port);
+            Map value = keyAndValue.getValue();
+            if(value.get("host")!=null && value.get("port")!=null) {
+                String host = String.valueOf(value.get("host"));
+                String port = String.valueOf(value.get("port"));
+                address.put("host",host);
+                address.put("port",port);
+            }else if(value.get("path")!=null) {
+                String path = String.valueOf(value.get("path"));
+                address.put("path",path);
+            }
+
+            String weight = value.get("weight")!=null?String.valueOf(value.get("weight")):"1";
             address.put("weight",weight);
             result.add(address);
         }

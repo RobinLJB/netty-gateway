@@ -22,11 +22,13 @@
 ### 细节
 应用程序默认读取resources下个application.yml
  
-  * server.port 代表服务端监听端口
+  * server.port 代表服务端监听端口 （tcpip端口监听和unix socket文件监听只能二选一）
+  * server.path 代表服务端unix socket文件 （tcpip端口监听和unix socket文件监听只能二选一）
   * proxy 代表上游服务器代理配置
   * proxy.serverXXX 代表具体某个上游服务器
   * proxy.serverXXX.host 代表具体某个上游服务器host
-  * proxy.serverXXX.port 代表具体某个上游服务器所在服务port
+  * proxy.serverXXX.port 代表具体某个上游服务器所在服务port  （tcpip地址端口监听和unix socket文件监听只能二选一）
+  * proxy.serverXXX.path 代表具体某个上游服务器服务端unix socket文件，此时默认上游动服务器就是本机 （tcpip端口监听和unix socket文件监听只能二选一）
   * proxy.serverXXX.weight 代表具体某个上游服务器所在服务接受服务的权重 默认是1 值越大 执行服务的概率越大
 
 当应用启动后在启动目录下会生成.netty-gateway/application.yml文件
