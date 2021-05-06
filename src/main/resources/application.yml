@@ -1,11 +1,9 @@
 server :
-  port : 8080
+  port : 33060
 
 proxy :
-  #server1 :
-    #host : localhost
-    #port : 8000
-    #weight : 1
+  server1 :
+    path : /var/run/mysqld/mysqld.sock
   #server2 :
     #host : localhost
     #port : 8001
